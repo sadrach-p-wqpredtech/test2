@@ -13,16 +13,17 @@ import pickle
 pd.set_option('display.max_columns', None)
 pd.set_option('display.max_rows', None)
 df_churn = pd.read_csv('telco_churn.csv')
-df_churn = df_churn[['gender', 'PaymentMethod', 'MonthlyCharges', 'tenure', 'Churn']].copy()
-
-print(set(df_churn['MonthlyCharges']))
 print(df_churn.head())
-# Ordinal feature encoding
-# https://www.kaggle.com/pratik1120/penguin-dataset-eda-classification-and-clustering
+
+df_churn = df_churn[['gender', 'PaymentMethod', 'MonthlyCharges', 'tenure', 'Contract', 'Churn']].copy()
+
+print(set(df_churn['Contract']))
+print(df_churn.head())
+
 df = df_churn.copy()
 df.fillna(0, inplace=True)
 target = 'Churn'
-encode = ['gender','PaymentMethod']
+encode = ['gender','PaymentMethod', 'Contract']
 
 for col in encode:
     dummy = pd.get_dummies(df[col], prefix=col)

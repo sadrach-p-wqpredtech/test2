@@ -33,6 +33,8 @@ customer churn means the customer does not make another purchase after a period 
 
 st.sidebar.header('User Input Features')
 
+#{'Two year', 'One year', 'Month-to-month'}
+
 
 df_selected = pd.read_csv("telco_churn.csv")
 df_selected['target'] = np.where(df_selected['Churn']=='Yes', 1, 0)
@@ -41,8 +43,11 @@ df_selected['Partner'] = np.where(df_selected['Partner']=='Yes', 1, 0)
 df_selected['Dependents'] = np.where(df_selected['Dependents']=='Yes', 1, 0)
 df_selected['PhoneService'] = np.where(df_selected['PhoneService']=='Yes', 1, 0)
 
+df_selected['Contract'] = df_selected['Contract'].astype('category')
+df_selected['Contract'] = df_selected['Contract'].cat.codes
+
 df_selected_all = df_selected[['gender', 'Partner', 'Dependents', 'PhoneService', 
-                                     'tenure', 'MonthlyCharges', 'target']].copy()
+                                     'tenure', 'MonthlyCharges', 'Contract', 'target']].copy()
 
 def filedownload(df):
     csv = df.to_csv(index=False)
@@ -78,11 +83,14 @@ else:
     def user_input_features():
         gender = st.sidebar.selectbox('gender',('Male','Female'))
         PaymentMethod = st.sidebar.selectbox('PaymentMethod',('Bank transfer (automatic)', 'Credit card (automatic)', 'Mailed check', 'Electronic check'))
+        contract = st.sidebar.selectbox('Contract',('Two year', 'One year', 'Month-to-month'))
         MonthlyCharges = st.sidebar.slider('Monthly Charges', 32.1,59.6,43.9)
         tenure = st.sidebar.slider('tenure', 13.1,21.5,17.2)
+        
 
         data = {'gender':[gender], 
                 'PaymentMethod':[PaymentMethod], 
+                'Contract': [contract],
                 'MonthlyCharges':[MonthlyCharges], 
                 'tenure':[tenure],}
         
@@ -105,7 +113,7 @@ df = pd.concat([input_df,churn],axis=0)
 
 # Encoding of ordinal features
 # https://www.kaggle.com/pratik1120/penguin-dataset-eda-classification-and-clustering
-encode = ['gender','PaymentMethod']
+encode = ['gender','PaymentMethod', 'Contract']
 for col in encode:
     dummy = pd.get_dummies(df[col], prefix=col)
     df = pd.concat([df,dummy], axis=1)
@@ -117,7 +125,8 @@ df.fillna(0, inplace=True)
 features = ['MonthlyCharges', 'tenure', 'gender_Female', 'gender_Male',
        'PaymentMethod_Bank transfer (automatic)',
        'PaymentMethod_Credit card (automatic)',
-       'PaymentMethod_Electronic check', 'PaymentMethod_Mailed check']
+       'PaymentMethod_Electronic check', 'PaymentMethod_Mailed check', 
+       'Contract_Month-to-month', 'Contract_One year', 'Contract_Two year']
 
 df = df[features]
 
